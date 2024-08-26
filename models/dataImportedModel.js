@@ -15,7 +15,7 @@ async function getImportedData(tableName, columns) {
       const pool = await poolPromise;
   
       const columnNames = Object.keys(columns).join(', ');
-      const query = `SELECT ${columnNames} FROM ${tableName}`;
+      const query = `SELECT ${columnNames} FROM ${tableName} order by 1`;
   
       console.log(`Executing query: ${query}`);
       const result = await pool.request().query(query);

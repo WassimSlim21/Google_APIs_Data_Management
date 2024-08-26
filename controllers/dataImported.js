@@ -27,14 +27,35 @@ async function getImportedData(req, res, next) {
     return res.status(400).json({ success: false, message: errorMessage });
   }
 
+  // Start time
+  const startTime = new Date();
+  console.log("Process started at:", startTime.toISOString());
+
   try {
     console.log("Fetching imported data from the database...");
     const data = await dataImportedModel.getImportedData(Table_name, Columns);
-    // console.log("Data fetched from the database:", data);
+    console.log("Data fetched from the database:", data);
+
+    // Convert specific columns to float
+    const floatColumns = ['PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM' ];
+    const convertedData = data.map(row => {
+      floatColumns.forEach(col => {
+        if (row[col]) {
+          row[col] = parseFloat(row[col]);
+        }
+      });
+      return row;
+    });
 
     console.log("Updating Google Sheets with the fetched data...");
-    await updateGoogleSheet(data, spreadsheetId, range, req.authClient, Columns);
+    await updateGoogleSheet(convertedData, spreadsheetId, range, req.authClient, Columns);
     console.log("Google Sheets updated successfully.");
+
+    // End time and duration calculation
+    const endTime = new Date();
+    const duration = (endTime - startTime) / 1000; // duration in seconds
+    console.log("Process ended at:", endTime.toISOString());
+    console.log(`Total duration: ${duration} seconds`);
 
     const successMessage = "Data has been exported to Google Sheets successfully.";
     console.log(successMessage);
