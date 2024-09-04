@@ -1,5 +1,6 @@
 const { google } = require('googleapis');
 const keys = require("../key.json");
+require('dotenv').config();
 
 /**
  * Middleware to connect to Google Sheets API.
@@ -14,6 +15,7 @@ const keys = require("../key.json");
  * @param {Function} next - The next middleware function in the stack.
  */
 async function connectToGsheet(req, res, next) {
+
   try {
     // Create a new JWT client using the service account credentials
     const auth = new google.auth.JWT(
@@ -29,6 +31,7 @@ async function connectToGsheet(req, res, next) {
 
     // Attach the authenticated client to the request object
     req.authClient = auth;
+    req.apiKey = process.env.APIKEY;
 
     // Pass control to the next middleware or route handler
     next();

@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
-const keys = require("../key.json");
 const dataImportedModel = require("../models/dataImportedModel");
+require('dotenv').config();
 
 /**
  * Handles the request to get imported data from the specified table and columns,
@@ -84,6 +84,7 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
     await sheets.spreadsheets.values.clear({
       spreadsheetId,
       range: dataRange,
+      key: process.env.APIKEY
     });
 
     console.log(`Updating the sheet with new data in the range: ${dataRange}`);
@@ -94,6 +95,7 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
       requestBody: {
         values: data.map((row) => Object.values(row)),
       },
+      key: process.env.APIKEY,
     });
 
     console.log("Data updated successfully:", updateRes.data);
