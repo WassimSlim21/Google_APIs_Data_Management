@@ -15,7 +15,8 @@ router.get('/sheetConnect', connectToGsheet, async (req, res) => {
 });
 
 // Define a POST route at the root path, which uses the getImportedData function from the controller.
-router.post('/',connectToGsheet, dataImportedController.getImportedData);
+router.post('/',connectToGsheet, dataImportedController.getArticles);
+router.post('/packRentree',connectToGsheet, dataImportedController.getImportedData);
 
 // Export the router to be used in other parts of the application.
 module.exports = router;
