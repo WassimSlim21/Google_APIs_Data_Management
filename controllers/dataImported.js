@@ -23,7 +23,7 @@ async function getImportedData(req, res, next) {
   // Check if Table_name or Columns are not provided in the request body
   if (!Table_name || !Columns) {
     const errorMessage = "Table_name and Columns are required.";
-    console.error(errorMessage);
+    console.error(succes, errorMessage);
     return res.status(400).json({ success: false, message: errorMessage });
   }
 
@@ -34,21 +34,11 @@ async function getImportedData(req, res, next) {
   try {
     console.log("Fetching imported data from the database...");
     const data = await dataImportedModel.getImportedData(Table_name, Columns);
-    console.log("Data fetched from the database:", data);
 
-    // Convert specific columns to float
-    const floatColumns = ['PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM' ];
-    const convertedData = data.map(row => {
-      floatColumns.forEach(col => {
-        if (row[col]) {
-          row[col] = parseFloat(row[col]);
-        }
-      });
-      return row;
-    });
+   
 
     console.log("Updating Google Sheets with the fetched data...");
-    await updateGoogleSheet(convertedData, spreadsheetId, range, req.authClient, Columns);
+    await updateGoogleSheet(data, spreadsheetId, range, req.authClient, Columns);
     console.log("Google Sheets updated successfully.");
 
     // End time and duration calculation
@@ -89,7 +79,6 @@ async function getArticles(req, res, next) {
   try {
     console.log("Fetching imported data from the database...");
     const data = await dataImportedModel.getImportedData(Table_name, Columns);
-    console.log("Data fetched from the database:", data);
 
     // Convert specific columns to float
     const floatColumns = ['PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM' ];
@@ -143,6 +132,7 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
       key: process.env.APIKEY
     });
 
+    
     console.log(`Updating the sheet with new data in the range: ${dataRange}`);
     const updateRes = await sheets.spreadsheets.values.update({
       spreadsheetId,

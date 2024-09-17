@@ -5,9 +5,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-// Import route modules.
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+
 const dataImportedRouter = require('./routes/dataImported_Route');
 
 // Create an Express application.
@@ -25,8 +23,7 @@ app.use(cookieParser()); // Middleware to parse cookies.
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from the 'public' directory.
 
 // Define routes.
-app.use('/', indexRouter); // Use the index router for the root path.
-app.use('/users', usersRouter); // Use the users router for '/users' path.
+
 app.use('/data_imported', dataImportedRouter); // Use the data imported router for '/data_imported' path.
 
 // Catch 404 and forward to error handler.
@@ -38,9 +35,9 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   // Set locals, only providing error details in development.
   res.locals.message = err.message; // Set the error message.
-  res.locals.error = req.app.get('env') === 'development' ? err : {}; // Set the error object if in development.
+  res.locals.error = req.app.get('env') === 'production' ? err : {}; // Set the error object if in development.
 
-  // Render the error page.
+
   res.status(err.status || 500); // Set the response status code.
   res.render('error'); // Render the 'error' view.
 });
