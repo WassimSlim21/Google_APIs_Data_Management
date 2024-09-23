@@ -11,12 +11,11 @@ router.get('/sheetConnect', connectToGsheet, async (req, res) => {
     // Example: const sheets = google.sheets({ version: 'v4', auth: req.authClient });
     // Perform your operations here
 
-    res.send('Example route with Google Sheets connection');
+    res.send('Example route with Google Sheets connection');    
 });
 
 // Define a POST route at the root path, which uses the getImportedData function from the controller.
 router.post('/',connectToGsheet, dataImportedController.getArticles);
 router.post('/packRentree',connectToGsheet, dataImportedController.getImportedData);
-
 // Export the router to be used in other parts of the application.
 module.exports = router;
