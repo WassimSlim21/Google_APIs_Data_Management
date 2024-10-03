@@ -218,11 +218,79 @@ async function uploadFileToDrive(req, res) {
 }
 
 
+async function getEndDate(req, res) {
+
+  const { spreadsheetId, PageName } = req.body;
+
+  console.log("Received request to get data from G1 with parameters:", {
+      spreadsheetId,
+      PageName,
+  });
+
+  // Check if spreadsheetId and PageName are provided in the request body
+  if (!spreadsheetId || !PageName) {
+      const errorMessage = "spreadsheetId and PageName are required.";
+      console.error(errorMessage);
+      return res.status(400).json({ success: false, message: errorMessage });
+  }
+
+  // Define the range for cell G1
+  const range = `${PageName}!B1`;
+
+  // Start time
+  const startTime = new Date();
+  console.log("Process started at:", startTime.toISOString());
+
+  try {
+      // Authenticate with Google Sheets API
+      const auth = req.authClient; // Use the authenticated client from the middleware
+      const sheets = google.sheets({ version: "v4", auth });
+
+      const response = await sheets.spreadsheets.values.get({
+          spreadsheetId,
+          range,
+          auth // Use the authenticated client here
+      });
+
+      const cellValue = response.data.values?.[0]?.[0];
+
+      // End time and duration calculation
+      const endTime = new Date();
+      const duration = (endTime - startTime) / 1000; // duration in seconds
+      console.log("Process ended at:", endTime.toISOString());
+      console.log(`Total duration: ${duration} seconds`);
+
+      if (cellValue !== undefined) {
+          const successMessage = "Value of B1 has been fetched successfully.";
+          console.log(successMessage);
+          console.log("Value of B1:", cellValue);
+          
+          return res.status(200).json({ 
+              success: true, 
+              data: { Code_AM: cellValue, exists: true }, // Add exists field
+              message: successMessage 
+          });
+      } else {
+          const noDataMessage = "No value found in cell B1.";
+          console.log(noDataMessage);
+          return res.status(200).json({ // Change status to 200 for successful execution
+              success: true, 
+              data: { Code_AM: null, exists: false }, // Add exists field as false
+              message: noDataMessage 
+          });
+      }
+  } catch (err) {
+      console.error("Error in Get Date Fin:", err);
+      return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
+  }
+}
+
 // Export the getImportedData function to be used in other parts of the application
 module.exports = {
   getImportedData,
   getArticles, 
-  uploadFileToDrive // Add this new function
+  uploadFileToDrive,
+  getEndDate // Add this new function
 
 };
 
