@@ -22,12 +22,12 @@ async function connectToGsheet(req, res, next) {
       keys.client_email,    // Client email from the service account
       null,                 // Path to the private key file (not used here)
       keys.private_key,     // Private key from the service account
-      ['https://www.googleapis.com/auth/spreadsheets'] // Scopes required for accessing Google Sheets
+      ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file'] // Add Drive scope here
     );
 
     // Authorize the client to use the Google Sheets API
     await auth.authorize();
-    console.log('Connected to Google Sheets');
+    console.log('Connected to Google Sheets and Google Drive');
 
     // Attach the authenticated client to the request object
     req.authClient = auth;
@@ -37,10 +37,10 @@ async function connectToGsheet(req, res, next) {
     next();
   } catch (error) {
     // Log the error if the connection fails
-    console.error('Error connecting to Google Sheets:', error);
+    console.error('Error connecting to Google Sheets/Drive:', error);
 
     // Send a 500 Internal Server Error response to the client
-    res.status(500).json({ error: 'Failed to connect to Google Sheets' });
+    res.status(500).json({ error: 'Failed to connect to Google Sheets/Drive' });
   }
 }
 

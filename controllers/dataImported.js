@@ -1,4 +1,6 @@
 const { google } = require("googleapis");
+const fs = require('fs');
+
 const dataImportedModel = require("../models/dataImportedModel");
 require('dotenv').config();
 
@@ -81,7 +83,7 @@ async function getArticles(req, res, next) {
     const data = await dataImportedModel.getImportedData(Table_name, Columns);
 
     // Convert specific columns to float
-    const floatColumns = ['PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM' ];
+    const floatColumns = ['Article', 'PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM' ];
     const convertedData = data.map(row => {
       floatColumns.forEach(col => {
         if (row[col]) {
@@ -123,16 +125,32 @@ async function getArticles(req, res, next) {
 async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
-    const dataRange = `${range}!A2`;
 
+    // Extract the keys from the columns object to use as headers
+    const headers = Object.keys(columns);
+    
+    // Set the header (columns) in the first row
+    const headerRange = `${range}!A1`;
+    console.log(`Updating the sheet with headers in the range: ${headerRange}`);
+    await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: headerRange,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [headers], // The header row is an array of column names
+      },
+      key: process.env.APIKEY,
+    });
+
+    // Set the data starting from the second row
+    const dataRange = `${range}!A2`;
     console.log(`Clearing existing data in the range: ${dataRange}`);
     await sheets.spreadsheets.values.clear({
       spreadsheetId,
       range: dataRange,
-      key: process.env.APIKEY
+      key: process.env.APIKEY,
     });
 
-    
     console.log(`Updating the sheet with new data in the range: ${dataRange}`);
     const updateRes = await sheets.spreadsheets.values.update({
       spreadsheetId,
@@ -144,15 +162,67 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
       key: process.env.APIKEY,
     });
 
-    console.log("Data updated successfully:", updateRes.data);
   } catch (error) {
     console.error("Error updating Google Sheets:", error);
     throw error;
   }
 }
+/**
+ * Uploads a file to Google Drive.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+async function uploadFileToDrive(req, res) {
+  const { filePath } = req.body; // Expect the file path in the request body
+  
+  if (!filePath) {
+    return res.status(400).json({ success: false, message: 'File path is required.' });
+  }
+
+  // Shared drive and folder details
+  const {sharedDriveId} =req.body;  // The shared drive ID
+  const {folderId} = req.body; // The folder inside the shared drive
+
+  console.log("sharedDrive", sharedDriveId);
+  console.log("folderId", folderId);
+
+  console.log('File path received:', filePath);
+
+  try {
+    const drive = google.drive({ version: 'v3', auth: req.authClient });
+    const fileMetadata = {
+      'name': filePath.split('\\').pop(), // Extracts the filename from the filePath
+      'parents': [folderId], // Folder ID where the file will be uploaded
+      'driveId': sharedDriveId // The shared drive ID
+    };
+    const media = {
+      mimeType: 'text/plain',
+      body: fs.createReadStream(filePath), // Read the file from the provided path
+    };
+
+    console.log('Uploading file to shared drive folder...');
+    const response = await drive.files.create({
+      resource: fileMetadata,
+      media: media,
+      fields: 'id',
+      supportsAllDrives: true // Required when interacting with shared drives
+    });
+
+    console.log('File uploaded successfully, File ID:', response.data.id);
+    res.status(200).json({ success: true, message: 'File uploaded successfully', fileId: response.data.id });
+  } catch (err) {
+    console.error('Error uploading file to Google Drive:', err);
+    res.status(500).json({ success: false, message: 'Failed to upload file', error: err.message });
+  }
+}
+
 
 // Export the getImportedData function to be used in other parts of the application
 module.exports = {
   getImportedData,
-  getArticles
+  getArticles, 
+  uploadFileToDrive // Add this new function
+
 };
+
