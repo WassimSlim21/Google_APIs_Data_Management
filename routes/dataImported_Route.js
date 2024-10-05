@@ -16,7 +16,7 @@ router.post('/articles',connectToGsheet, dataImportedController.getArticles);
 // Post Any Data to Gsheet
 router.post('/',connectToGsheet, dataImportedController.getImportedData);
 router.post('/upload', connectToGsheet, dataImportedController.uploadFileToDrive);
-router.post('/get_end_date', connectToGsheet, dataImportedController.getEndDate);
+router.post('/uploadMultiples', connectToGsheet, dataImportedController.uploadMultipleFiles);
 
 // Export the router to be used in other parts of the application.
 module.exports = router;

@@ -22,7 +22,7 @@ async function connectToGsheet(req, res, next) {
       keys.client_email,    // Client email from the service account
       null,                 // Path to the private key file (not used here)
       keys.private_key,     // Private key from the service account
-      ['https://www.googleapis.com/auth/spreadsheets', 'https://www.googleapis.com/auth/drive.file'] // Add Drive scope here
+      keys.scopes // Add Drive scope here
     );
 
     // Authorize the client to use the Google Sheets API

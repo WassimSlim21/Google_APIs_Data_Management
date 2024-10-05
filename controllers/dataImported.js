@@ -1,5 +1,6 @@
 const { google } = require("googleapis");
 const fs = require('fs');
+const path = require('path');
 
 const dataImportedModel = require("../models/dataImportedModel");
 require('dotenv').config();
@@ -12,6 +13,7 @@ require('dotenv').config();
  * @param {Object} res - The response object, used to send a response back to the client.
  * @param {Function} next - The next middleware function in the stack.
  */
+
 async function getImportedData(req, res, next) {
   const { Table_name, Columns, spreadsheetId, range } = req.body;
 
@@ -57,6 +59,15 @@ async function getImportedData(req, res, next) {
     res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
   }
 }
+
+/**
+ * Handles the request to get articles data from the specified table and columns,
+ * Conversion to float for some article columns
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 async function getArticles(req, res, next) {
   const { Table_name, Columns, spreadsheetId, range } = req.body;
 
@@ -167,6 +178,8 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
     throw error;
   }
 }
+
+
 /**
  * Uploads a file to Google Drive.
  *
@@ -217,80 +230,99 @@ async function uploadFileToDrive(req, res) {
   }
 }
 
+/**
+ * Uploads all files from the "E:\\ARCHIVES" folder to a shared drive in parallel.
+ * Deletes all existing files in the shared drive folder before uploading.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+async function uploadMultipleFiles(req, res) {
+  // Path to the folder containing the files
+  const {folderPath} = req.body;
 
-async function getEndDate(req, res) {
-
-  const { spreadsheetId, PageName } = req.body;
-
-  console.log("Received request to get data from G1 with parameters:", {
-      spreadsheetId,
-      PageName,
-  });
-
-  // Check if spreadsheetId and PageName are provided in the request body
-  if (!spreadsheetId || !PageName) {
-      const errorMessage = "spreadsheetId and PageName are required.";
-      console.error(errorMessage);
-      return res.status(400).json({ success: false, message: errorMessage });
-  }
-
-  // Define the range for cell G1
-  const range = `${PageName}!B1`;
-
-  // Start time
-  const startTime = new Date();
-  console.log("Process started at:", startTime.toISOString());
+  // Shared drive and folder details
+  const { sharedDriveId, folderId } = req.body;  // The shared drive ID and folder ID
 
   try {
-      // Authenticate with Google Sheets API
-      const auth = req.authClient; // Use the authenticated client from the middleware
-      const sheets = google.sheets({ version: "v4", auth });
+    // Initialize Google Drive client
+    const drive = google.drive({ version: 'v3', auth: req.authClient });
 
-      const response = await sheets.spreadsheets.values.get({
-          spreadsheetId,
-          range,
-          auth // Use the authenticated client here
+    // Step 1: Delete all files in the target folder
+    const deleteExistingFiles = async () => {
+      const listParams = {
+        q: `'${folderId}' in parents and trashed = false`,
+        fields: 'files(id)',
+        supportsAllDrives: true,  // Required for shared drives
+        includeItemsFromAllDrives: true,
+        driveId: sharedDriveId,
+        corpora: 'drive',
+      };
+
+      const filesInFolder = await drive.files.list(listParams);
+      const deletePromises = filesInFolder.data.files.map(file =>
+        drive.files.delete({
+          fileId: file.id,
+          supportsAllDrives: true,  // Required for shared drives
+        })
+      );
+      await Promise.all(deletePromises);
+      console.log('All existing files deleted successfully.');
+    };
+
+    await deleteExistingFiles();
+
+    // Step 2: Get all file names from the local folder
+    const fileNames = fs.readdirSync(folderPath);
+
+    if (!fileNames || fileNames.length === 0) {
+      return res.status(400).json({ success: false, message: 'No files found in the folder.' });
+    }
+
+    // Step 3: Function to upload a single file
+    const uploadFile = (fileName) => {
+      const filePath = path.join(folderPath, fileName); // Full path of the file
+
+      const fileMetadata = {
+        'name': fileName, // File name
+        'parents': [folderId], // Folder ID in the shared drive
+        'driveId': sharedDriveId, // Shared drive ID
+      };
+
+      const media = {
+        mimeType: 'application/octet-stream', // Set the correct mime type based on your file types
+        body: fs.createReadStream(filePath),
+      };
+
+      return drive.files.create({
+        resource: fileMetadata,
+        media: media,
+        fields: 'id',
+        supportsAllDrives: true, // Required for shared drives
       });
+    };
 
-      const cellValue = response.data.values?.[0]?.[0];
+    // Step 4: Upload all files in parallel
+    const uploadPromises = fileNames.map(uploadFile);
+    const uploadResults = await Promise.all(uploadPromises);
 
-      // End time and duration calculation
-      const endTime = new Date();
-      const duration = (endTime - startTime) / 1000; // duration in seconds
-      console.log("Process ended at:", endTime.toISOString());
-      console.log(`Total duration: ${duration} seconds`);
+    // Collect uploaded file IDs
+    const fileIds = uploadResults.map(result => result.data.id);
 
-      if (cellValue !== undefined) {
-          const successMessage = "Value of B1 has been fetched successfully.";
-          console.log(successMessage);
-          console.log("Value of B1:", cellValue);
-          
-          return res.status(200).json({ 
-              success: true, 
-              data: { Code_AM: cellValue, exists: true }, // Add exists field
-              message: successMessage 
-          });
-      } else {
-          const noDataMessage = "No value found in cell B1.";
-          console.log(noDataMessage);
-          return res.status(200).json({ // Change status to 200 for successful execution
-              success: true, 
-              data: { Code_AM: null, exists: false }, // Add exists field as false
-              message: noDataMessage 
-          });
-      }
+    console.log('Files uploaded successfully:', fileIds);
+    res.status(200).json({ success: true, message: 'Files uploaded successfully', fileIds });
   } catch (err) {
-      console.error("Error in Get Date Fin:", err);
-      return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
+    console.error('Error uploading files:', err);
+    res.status(500).json({ success: false, message: 'Failed to upload files', error: err.message });
   }
 }
 
-// Export the getImportedData function to be used in other parts of the application
+
 module.exports = {
   getImportedData,
   getArticles, 
   uploadFileToDrive,
-  getEndDate // Add this new function
+  uploadMultipleFiles
 
 };
 
