@@ -1,6 +1,39 @@
 # GCPMigrationXProject
 
-This project is a Node.js-based web application designed to automate the process of fetching, processing, and storing data from Google Sheets into an SQL database. It also enables users to upload files to Google Drive and perform other data management operations efficiently. The application interacts with Google Sheets API and Google Drive API for seamless spreadsheet and file management and uses Microsoft SQL Server to handle database operations. The system incorporates custom middleware for Google Sheets authentication, data retrieval, and SQL data insertion.
+This project is a Node.js-based web application that automates the process of fetching, processing, and storing data from Google Sheets into a Microsoft SQL Server database. It enables users to efficiently upload files to Google Drive and perform various data management operations by seamlessly integrating with the Google Sheets API and Google Drive API. The application features custom middleware for authentication, data retrieval, and SQL data insertion.
+
+Additionally, the project employs an SSIS package that loads data from diverse sources, including Oracle, PostgreSQL, and Microsoft SQL Server, as well as generated files from other servers. The ETL process populates a local SQL Server database, and C# scripts are used to call the Node.js API to synchronize this data with Google Sheets and Google Drive, ensuring smooth data management across platforms.
+
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Project%20Overview.png)
+
+## Data Flow : 
+### Step 1 - Data Extraction (Get Data):
+The process begins with extracting data from an external database into an ETL (Extract, Transform, Load) process managed by SSIS.
+
+### Step 2 - Data Insertion (Insert Data):
+Once the data is extracted, it is inserted into a local SQL Server database using the SSIS ETL process.
+
+### Step 3 - HTTP Request (Post Request):
+The SSIS process sends an HTTP request to a Node.js application, specifying the requirements (table name, columns, Google Sheets ID, etc.). Node.js returns a status code for the request, which is received and processed by SSIS.
+
+### Step 4 - SQL Query (SQL Query):
+The Node.js application executes an SQL query on the local SQL Server database to retrieve the necessary data as a result set.
+
+### Step 5 - Google Account Service (Account Service):
+Node.js retrieves the necessary authentication information from the Google Account service to access Google Sheets, adhering to an IP whitelisting rule to ensure that only specified IPs can interact with the spreadsheets.
+
+### Step 6 - Insertion into Google Sheets (Insert Data via API):
+Node.js uses the Google Sheets API to insert data into the specified spreadsheet. The data is formatted in JSON before being sent.
+
+### Step 7 - Insertion of Files into Google Drive (Insert Files into Google Drive):
+Large files are uploaded to Google Drive, replacing the need for email attachments. This utilizes Shared Drives to facilitate access to updated files while removing old files to maintain organization.
+
+### Step 8 - Execution of the SSIS Package:
+The SSIS package is executed via a SQL Agent. Results and status codes are returned at each step to ensure process tracking and error management.
+
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Data%20Flow.png)
+
+
 
 ## Table of Contents
 
@@ -13,7 +46,6 @@ This project is a Node.js-based web application designed to automate the process
 - [Deployment](#deployment)
 - [Contributing](#contributing)
 - [License](#license)
-
 ## Features
 
 - Fetch and update data between SQL Server and Google Sheets
@@ -22,6 +54,9 @@ This project is a Node.js-based web application designed to automate the process
 - Authenticate with Google APIs
 - Asynchronous operations for improved performance
 - Error handling and data integrity checks
+
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/napkin-selection.png)
+
 
 ## Installation
 
@@ -76,6 +111,7 @@ GCPMigrationXProject/
 ├── key.json                # Google API credentials
 └── package.json            # Project dependencies and scripts
 ```
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Project%20Structure.png)
 
 ## API Documentation
 
