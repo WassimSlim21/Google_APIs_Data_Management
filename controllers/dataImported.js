@@ -187,15 +187,12 @@ async function updateGoogleSheet(data, spreadsheetId, range, auth, columns) {
  * @param {Object} res - The response object.
  */
 async function uploadFileToDrive(req, res) {
-  const { filePath } = req.body; // Expect the file path in the request body
+  const { filePath ,sharedDriveId, folderId} = req.body; // Expect the file path, SharedDriveId, folderId in the request body
   
   if (!filePath) {
     return res.status(400).json({ success: false, message: 'File path is required.' });
   }
 
-  // Shared drive and folder details
-  const {sharedDriveId} =req.body;  // The shared drive ID
-  const {folderId} = req.body; // The folder inside the shared drive
 
   console.log("sharedDrive", sharedDriveId);
   console.log("folderId", folderId);

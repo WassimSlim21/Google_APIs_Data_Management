@@ -11,10 +11,15 @@ router.get('/sheetConnect', connectToGsheet, async (req, res) => {
     res.send('Verify Google Connection');    
 });
 
-// Post Articles Data to Gsheet
-router.post('/articles',connectToGsheet, dataImportedController.getArticles);
+
 // Post Any Data to Gsheet
+// POST 172.17.1.130:3000/data_imported/ req.body
 router.post('/',connectToGsheet, dataImportedController.getImportedData);
+
+
+// Post Articles Data to Gsheet Développement spécéfisue avec transformation des données 
+router.post('/articles',connectToGsheet, dataImportedController.getArticles);
+
 router.post('/upload', connectToGsheet, dataImportedController.uploadFileToDrive);
 router.post('/uploadMultiples', connectToGsheet, dataImportedController.uploadMultipleFiles);
 

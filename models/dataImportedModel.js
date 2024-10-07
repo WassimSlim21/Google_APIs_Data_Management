@@ -15,12 +15,11 @@ async function getImportedData(tableName, columns) {
       const pool = await poolPromise;
   
       const columnNames = Object.keys(columns).join(', ');
-      const query = `SELECT ${columnNames} FROM ${tableName} order by 1`;
+      const query = `SELECT ${columnNames} FROM ${tableName}`;
   
       console.log(`Executing query: ${query}`);
       const result = await pool.request().query(query);
   
-    //   console.log("Data retrieved from the database:", result.recordset);
       return result.recordset;
     } catch (err) {
       console.error("Error retrieving data from the database:", err);
@@ -29,5 +28,5 @@ async function getImportedData(tableName, columns) {
   }
   
   module.exports = {
-    getImportedData,
+    getImportedData
   };

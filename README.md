@@ -276,8 +276,19 @@ module.exports = {
 ```
 
 To deploy or update the application:
+0. Clone this repository : 
+https://github.com/jessety/pm2-installer
+`pm2-installer` will check if it can contact the npm registry and install online if possible, or use the offline cache if not.
+- The `pm2` service runs as the `Local Service` user. To interact with `pm2`, you need to use an elevated terminal (e.g. right click and select "Run as Admin") before running any commands that interface with the service, e.g. `pm2 list`.
+- If you update node and npm, make sure to either manually re-configure your npm & node installations or run `npm run configure` again.
 
-1. Make your changes to the codebase
+Under the Cloned Repository `pm2-installer` Run these commands : 
+-  `npm install`
+-  `npm run configure`
+-  `npm run setup`
+
+1. Start the pm2 app using the ecosystem.config.js file : 
+- `pm2 start ecosystem.config.js --env production`
 2. Save the PM2 configuration:
    ```
    pm2 save
