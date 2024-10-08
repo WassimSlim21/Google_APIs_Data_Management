@@ -167,6 +167,60 @@ GCPMigrationXProject/
 
 - Fields are similar to `/data_imported/`, but specific columns are converted to float
 
+### `/exportData`
+
+**Method:** POST
+
+**Description:** Fetch data from a specified Google Sheets document
+
+**Request Body:**
+```json
+{
+  "spreadsheetId": "string",
+  "range": "string",
+  "PageName": "string"
+}
+```
+
+- `spreadsheetId`: The ID of the Google Sheet to fetch data from
+- `range`: The range of cells to retrieve (e.g., "A1:D10")
+- `PageName`: The name of the worksheet (tab) in the sheet
+
+**Response (Success):**
+```json
+{
+  "success": true,
+  "message": "Data has been fetched from Google Sheets successfully.",
+  "data": [ ... ],
+  "pageName": "string",
+  "sheetName": "string",
+  "sheetId": "string",
+  "range": "string",
+  "duration": "string"
+}
+```
+
+- `data`: An array of objects representing the fetched data
+- `pageName`: The name of the worksheet (tab) that was queried
+- `sheetName`: The title of the Google Sheets document
+- `sheetId`: The ID of the Google Sheets document
+- `range`: The full range that was queried, including the worksheet name
+- `duration`: The time taken to fetch the data
+
+**Response (Error):**
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "error": "Detailed error message",
+  "pageName": "string",
+  "sheetName": "string",
+  "sheetId": "string",
+  "range": "string"
+}
+```
+
+
 ### `/data_imported/upload`
 
 **Method:** POST
@@ -238,6 +292,9 @@ GCPMigrationXProject/
 
 - `spreadsheetId`: The ID of the Google Sheet containing the CodeAM
 - `PageName`: The name of the sheet to retrieve the CodeAM from (the CodeAM is expected to be in cell G1)
+
+
+
 
 
 ## Dependencies
