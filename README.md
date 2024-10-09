@@ -88,6 +88,8 @@ The SSIS package is executed via a SQL Agent. Results and status codes are retur
 
 ## Project Structure
 
+## Project Structure
+
 ```
 GCPMigrationXProject/
 │
@@ -96,6 +98,7 @@ GCPMigrationXProject/
 ├── config/
 │   └── db.js               # Database configuration
 ├── controllers/
+│   ├── dataExported.js     # Controller for data export operations
 │   ├── dataImported.js     # Controller for data import operations
 │   └── jeuTirage.js        # Controller for game rules operations
 ├── middlewares/
@@ -103,14 +106,18 @@ GCPMigrationXProject/
 ├── models/
 │   └── dataImportedModel.js # Model for data operations
 ├── routes/
+│   ├── dataExported_Route.js # Routes for data export operations
 │   ├── dataImported_Route.js # Routes for data import operations
 │   └── jeuTirage.js          # Routes for game rules operations
+├── services/
+│   └── googleService.js    # Google API related services
 ├── .env                    # Environment variables
 ├── app.js                  # Main application file
 ├── ecosystem.config.js     # PM2 configuration file
 ├── key.json                # Google API credentials
 └── package.json            # Project dependencies and scripts
 ```
+
 ![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Project%20Structure.png)
 
 ## API Documentation

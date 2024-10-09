@@ -2,7 +2,6 @@ const { google } = require('googleapis'); // Import Google Sheets API
 const sheets = google.sheets('v4');       // Initialize the Sheets API
 require('dotenv').config();               // Load environment variables from .env
 
-
 /**
  * Fetches data from a specified Google Sheets document.
  * 
@@ -18,26 +17,6 @@ require('dotenv').config();               // Load environment variables from .en
  * @param {Object} res - Express response object
  * @param {function} next - Express next middleware function
  * @returns {Promise<void>} - Sends a JSON response with the fetched data or an error message
- * 
- * @example
- * // Request body:
- * // {
- * //   "spreadsheetId": "your_spreadsheet_id_here",
- * //   "range": "A1:D10",
- * //   "PageName": "Sheet1"
- * // }
- * 
- * // Response (Success):
- * // {
- * //   "success": true,
- * //   "message": "Data has been fetched from Google Sheets successfully.",
- * //   "data": [ ... ],
- * //   "pageName": "Sheet1",
- * //   "sheetName": "My Spreadsheet",
- * //   "sheetId": "your_spreadsheet_id_here",
- * //   "range": "Sheet1!A1:D10",
- * //   "duration": "2.3 seconds"
- * // }
  */
 async function get_data_Gsheet(req, res, next) {
     const { spreadsheetId, range, PageName } = req.body;
@@ -68,7 +47,15 @@ async function get_data_Gsheet(req, res, next) {
             spreadsheetId,
             auth
         });
+
+        // Check if the sheet exists
         const sheetName = sheetMetadata.data.properties.title;
+        const sheetTabs = sheetMetadata.data.sheets.map(sheet => sheet.properties.title);
+        if (!sheetTabs.includes(PageName)) {
+            const errorMessage = `The specified PageName "${PageName}" does not exist in the spreadsheet.`;
+            console.error(errorMessage);
+            return res.status(400).json({ success: false, message: errorMessage });
+        }
 
         // Construct the full range by combining the tab name (PageName) and the range
         const fullRange = `${PageName}!${range}`;
@@ -83,7 +70,7 @@ async function get_data_Gsheet(req, res, next) {
         const rows = response.data.values;
 
         // If data is found, process the rows into a structured JSON object
-        if (rows.length) {
+        if (rows && rows.length) {
             const [headers, ...dataRows] = rows;
 
             const data = dataRows.map(row => {
@@ -128,16 +115,23 @@ async function get_data_Gsheet(req, res, next) {
             });
         }
     } catch (err) {
-        // Log and return an internal server error response if any exception occurs
+        // Handle different types of errors with appropriate responses
+        if (err.response && err.response.status === 404) {
+            const notFoundMessage = "The specified range or spreadsheet was not found.";
+            console.error(notFoundMessage, err.message);
+            return res.status(404).json({
+                success: false,
+                message: notFoundMessage,
+                error: err.message
+            });
+        }
+
+        // Log and return an internal server error response for other exceptions
         console.error("Error in get_data_Gsheet:", err);
         return res.status(500).json({
             success: false,
             message: "Internal Server Error",
-            error: err.message,
-            pageName: PageName,
-            sheetName,
-            sheetId: spreadsheetId,
-            range: fullRange
+            error: err.message
         });
     }
 }

@@ -106,6 +106,8 @@ async function truncateTable() {
         console.error('Error truncating the table:', err);
     }
 }
+
+
 async function getCodeAM(req, res) {
     const { spreadsheetId, PageName } = req.body;
 
