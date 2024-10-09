@@ -27,7 +27,7 @@ async function connectToGsheet(req, res, next) {
 
     // Authorize the client to use the Google Sheets API
     await auth.authorize();
-    console.log('Connected to Google Sheets and Google Drive');
+    console.log('Connected to Google APIs (Drive & Sheet) ');
 
     // Attach the authenticated client to the request object
     req.authClient = auth;

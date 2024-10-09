@@ -15,7 +15,7 @@ const { sql, poolPromise } = require('../config/db');
  */
 async function getDataFromSQLServer(tableName, columns) {
     try {
-      console.log(`Connecting to the database to fetch data from table: ${tableName} with columns: ${columns.join(', ')}`);
+      console.log(`Connecting to the database to fetch data from table: ${tableName}`);
       
       // Await the database connection pool
       const pool = await poolPromise;

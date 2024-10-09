@@ -69,7 +69,7 @@ const connectToGsheet = require('../middlewares/gsheetConnection');
  * @param {function} next - Express next middleware function
  * @returns {Promise<void>} - Sends a JSON response with the fetched data or an error message
  */
-router.post('/exportData', connectToGsheet, dataExportedController.get_data_Gsheet);
+router.post('/', connectToGsheet, dataExportedController.get_data_Gsheet);
 
 // Export the router to be used in other parts of the application.
 module.exports = router;
