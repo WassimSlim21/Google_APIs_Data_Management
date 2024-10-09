@@ -15,7 +15,11 @@ router.get('/sheetConnect', connectToGsheet, async (req, res) => {
 router.post('/articles',connectToGsheet, dataImportedController.getArticles);
 // Post Any Data to Gsheet
 router.post('/',connectToGsheet, dataImportedController.getImportedData);
+
+//Upload One file to ggogle Drive
 router.post('/upload', connectToGsheet, dataImportedController.uploadFileToDrive);
+
+//Upload Multiples Files to Google Drive
 router.post('/uploadMultiples', connectToGsheet, dataImportedController.uploadMultipleFiles);
 
 // Export the router to be used in other parts of the application.
