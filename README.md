@@ -118,7 +118,7 @@ GCPMigrationXProject/
 └── package.json            # Project dependencies and scripts
 ```
 
-![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Project%20Structure.png)
+![alt text](https://github.com/WaassimDev/proj-x-gsheet/blob/prod/Project%20Structure.png)
 
 ## API Documentation
 
