@@ -1,7 +1,16 @@
+// Import the express module to create a router.
+const express = require('express');
+// Create a new router instance.
+const router = express.Router();
+// Import the dataExportedController module, which contains the getImportedData function.
+const dataExportedController = require('../controllers/dataExported');
+const connectToGsheet = require('../middlewares/gsheetConnection');
+
 /**
  * POST /exportData
  * 
  * This route allows you to export data to a specified Google Sheets document.
+ * It clears the existing data in the specified range before exporting new data.
  * 
  * **Request Example:**
  * 

@@ -43,6 +43,9 @@ async function uploadFileToDrive(req, res) {
 
 /**
  * Uploads multiple files from a folder to Google Drive.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
  */
 async function uploadMultipleFiles(req, res) {
   const { folderPath, sharedDriveId, folderId } = req.body;
@@ -118,8 +121,9 @@ async function updateGoogleSheet(data, spreadsheetId, pageName, auth, columns) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const headers = Object.keys(columns);
-    
+    const headers = Object.keys(columns).map(header => header.replace(/[\[\]]/g, ''));
+   
+   
     const headerRange = `${pageName}!A1`;
     console.log(`Updating the sheet with headers in the range: ${headerRange}`);
     await sheets.spreadsheets.values.update({
@@ -132,14 +136,15 @@ async function updateGoogleSheet(data, spreadsheetId, pageName, auth, columns) {
       key: process.env.APIKEY,
     });
 
-    const dataRange = `${pageName}!A2`;
+    // Deleting all the Data : 
+    const dataRange = `${pageName}!A2:ZZZ`;
     console.log(`Clearing existing data in the range: ${dataRange}`);
     await sheets.spreadsheets.values.clear({
       spreadsheetId,
       range: dataRange,
       key: process.env.APIKEY,
     });
-
+// Updating the sheet with new data in the range
     console.log(`Updating the sheet with new data in the range: ${dataRange}`);
     await sheets.spreadsheets.values.update({
       spreadsheetId,
