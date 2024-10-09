@@ -9,7 +9,7 @@ const { sql, poolPromise } = require('../config/db');
  * @returns {Promise<Array>} - A promise that resolves to the retrieved data.
  * @throws {Error} - Throws an error if the query fails.
  */
-async function getImportedData(tableName, columns) {
+async function getDataFromSQLServer(tableName, columns) {
     try {
       console.log(`Connecting to the database to fetch data from table: ${tableName} with columns: ${Object.keys(columns).join(', ')}`);
       const pool = await poolPromise;
@@ -28,5 +28,5 @@ async function getImportedData(tableName, columns) {
   }
   
   module.exports = {
-    getImportedData
+    getDataFromSQLServer
   };
