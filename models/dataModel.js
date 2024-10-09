@@ -15,14 +15,13 @@ const { sql, poolPromise } = require('../config/db');
  */
 async function getDataFromSQLServer(tableName, columns) {
     try {
-      console.log(`Connecting to the database to fetch data from table: ${tableName} with columns: ${Object.keys(columns).join(', ')}`);
+      console.log(`Connecting to the database to fetch data from table: ${tableName} with columns: ${columns.join(', ')}`);
       
       // Await the database connection pool
       const pool = await poolPromise;
   
-      // Join the object keys (column names) into a comma-separated string
-      const columnNames = Object.keys(columns).join(', ');
-
+      // Join the column names into a comma-separated string
+      const columnNames = columns.join(', ');
       // Construct the SQL query
       const query = `SELECT ${columnNames} FROM ${tableName}`;
   
@@ -62,8 +61,8 @@ async function getDataFromSQLServerWithCondition(tableName, columns, condition) 
       // Await the database connection pool
       const pool = await poolPromise;
   
-      // Join the object keys (column names) into a comma-separated string
-      const columnNames = Object.keys(columns).join(', ');
+      // Join the column names into a comma-separated string
+      const columnNames = columns.join(', ');
 
       // Construct the SQL query with the WHERE condition
       const query = `SELECT ${columnNames} FROM ${tableName} WHERE ${condition}`;

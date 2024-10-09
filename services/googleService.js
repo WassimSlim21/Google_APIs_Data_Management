@@ -121,7 +121,7 @@ async function updateGoogleSheet(data, spreadsheetId, pageName, auth, columns) {
   try {
     const sheets = google.sheets({ version: "v4", auth });
 
-    const headers = Object.keys(columns).map(header => header.replace(/[\[\]]/g, ''));
+    const headers = columns.map(header => header.replace(/[\[\]]/g, ''));
    
    
     const headerRange = `${pageName}!A1`;
