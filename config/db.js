@@ -1,5 +1,6 @@
 // Import the mssql package for interacting with SQL Server.
 const sql = require('mssql');
+
 // Load environment variables from a .env file into process.env.
 require('dotenv').config();
 

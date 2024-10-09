@@ -1,9 +1,17 @@
+// Import the googleapis library and configure the Sheets API
 const { google } = require('googleapis');
 const sheets = google.sheets('v4');
-const { sql, poolPromise } = require('../config/db'); // Adjust the path to your config file
-
+const dataImportedModel = require("../models/dataModel");
 require('dotenv').config();
 
+/**
+ * Retrieves rules from a Google Sheets spreadsheet and inserts the data into SQL Server.
+ * 
+ * @param {Object} req - The request object containing spreadsheetId, range, and PageName.
+ * @param {Object} res - The response object to send back the data or error.
+ * @param {Function} next - The next middleware in the stack (optional).
+ * @returns {Promise<void>}
+ */
 async function get_rules(req, res, next) {
     const { spreadsheetId, range, PageName } = req.body;
 
@@ -19,14 +27,15 @@ async function get_rules(req, res, next) {
         return res.status(400).json({ success: false, message: errorMessage });
     }
 
-    // Start time
+    // Start time for performance logging
     const startTime = new Date();
     console.log("Process started at:", startTime.toISOString());
 
     try {
-        // Authenticate with Google Sheets API
+        // Authenticate with Google Sheets API using the client from middleware
         const auth = req.authClient; // Use the authenticated client from the middleware
 
+        // Fetch the data from the Google Sheets API
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -39,15 +48,16 @@ async function get_rules(req, res, next) {
             // Extract headers and map data to objects
             const [headers, ...dataRows] = rows;
 
+            // Map each row of data to a structured object with column names as keys
             const data = dataRows.map(row => {
                 const rowData = {};
                 headers.forEach((header, index) => {
-                    rowData[header] = row[index] || ''; // Handle missing values
+                    rowData[header] = row[index] || ''; // Handle missing values by setting empty string
                 });
                 return rowData;
             });
 
-            // End time and duration calculation
+            // End time for performance logging and duration calculation
             const endTime = new Date();
             const duration = (endTime - startTime) / 1000; // duration in seconds
             console.log("Process ended at:", endTime.toISOString());
@@ -55,8 +65,8 @@ async function get_rules(req, res, next) {
 
             const successMessage = "Data has been fetched from Google Sheets successfully.";
             console.log(successMessage);
-            console.log(data.CodeAM);
-            await insertData(data);
+            console.log(data.CodeAM); // Log the CodeAM data for debugging
+            await dataImportedModel.insertData(data); // Insert the data into the database
             return res.status(200).json({ success: true, data, message: successMessage });
         } else {
             const noDataMessage = "No data found in the specified range.";
@@ -69,43 +79,13 @@ async function get_rules(req, res, next) {
     }
 }
 
-async function insertData(data) {
-    try {
-        await truncateTable();
-        // Get the connection pool from poolPromise
-        const pool = await poolPromise;
-
-        // Prepare and execute the SQL INSERT statement
-        const request = new sql.Request(pool);
-        for (const row of data) {
-            await request.query(`
-                INSERT INTO regles (Date_Tirage, Heure, Cadeaux, CodeAM)
-                VALUES ('${row.Date}', '${row.Heure}', '${row.Cadeaux}', '${row.CodeAM}')
-            `);
-        }
-
-        console.log('Data inserted successfully');
-    } catch (err) {
-        console.error('Error inserting data:', err);
-    }
-}
-
-async function truncateTable() {
-    try {
-        // Get the connection pool from poolPromise
-        const pool = await poolPromise;
-
-        // SQL query to truncate the table
-        const query = 'TRUNCATE TABLE regles';
-        
-        // Execute the query
-        await pool.request().query(query);
-        
-        console.log('Table truncated successfully.');
-    } catch (err) {
-        console.error('Error truncating the table:', err);
-    }
-}
+/**
+ * Retrieves the value of cell G1 from a specified Google Sheets spreadsheet.
+ * 
+ * @param {Object} req - The request object containing spreadsheetId and PageName.
+ * @param {Object} res - The response object to send back the data or error.
+ * @returns {Promise<void>}
+ */
 async function getCodeAM(req, res) {
     const { spreadsheetId, PageName } = req.body;
 
@@ -124,14 +104,15 @@ async function getCodeAM(req, res) {
     // Define the range for cell G1
     const range = `${PageName}!G1`;
 
-    // Start time
+    // Start time for performance logging
     const startTime = new Date();
     console.log("Process started at:", startTime.toISOString());
 
     try {
-        // Authenticate with Google Sheets API
+        // Authenticate with Google Sheets API using the client from middleware
         const auth = req.authClient; // Use the authenticated client from the middleware
 
+        // Fetch the data from Google Sheets API
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId,
             range,
@@ -140,12 +121,13 @@ async function getCodeAM(req, res) {
 
         const cellValue = response.data.values?.[0]?.[0];
 
-        // End time and duration calculation
+        // End time for performance logging and duration calculation
         const endTime = new Date();
         const duration = (endTime - startTime) / 1000; // duration in seconds
         console.log("Process ended at:", endTime.toISOString());
         console.log(`Total duration: ${duration} seconds`);
 
+        // If a value is found in cell G1, return it
         if (cellValue !== undefined) {
             const successMessage = "Value of G1 has been fetched successfully.";
             console.log(successMessage);
@@ -170,4 +152,6 @@ async function getCodeAM(req, res) {
         return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
     }
 }
+
+// Export the functions to be used in other modules
 module.exports = { get_rules, getCodeAM };
