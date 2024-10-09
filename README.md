@@ -4,7 +4,7 @@ This project is a Node.js-based web application that automates the process of fe
 
 Additionally, the project employs an SSIS package that loads data from diverse sources, including Oracle, PostgreSQL, and Microsoft SQL Server, as well as generated files from other servers. The ETL process populates a local SQL Server database, and C# scripts are used to call the Node.js API to synchronize this data with Google Sheets and Google Drive, ensuring smooth data management across platforms.
 
-![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Project%20Overview.png)
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/public/images/Project%20Overview.png)
 
 ## Data Flow : 
 ### Step 1 - Data Extraction (Get Data):
@@ -31,7 +31,7 @@ Large files are uploaded to Google Drive, replacing the need for email attachmen
 ### Step 8 - Execution of the SSIS Package:
 The SSIS package is executed via a SQL Agent. Results and status codes are returned at each step to ensure process tracking and error management.
 
-![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/Data%20Flow.png)
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/public/images/Data%20Flow.png)
 
 
 
@@ -55,7 +55,7 @@ The SSIS package is executed via a SQL Agent. Results and status codes are retur
 - Asynchronous operations for improved performance
 - Error handling and data integrity checks
 
-![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/napkin-selection.png)
+![alt text](https://github.com/WassimSlim21/proj-x-gsheet/blob/prod/public/images/napkin-selection.png)
 
 
 ## Installation
@@ -118,7 +118,7 @@ GCPMigrationXProject/
 └── package.json            # Project dependencies and scripts
 ```
 
-![alt text](https://github.com/WaassimDev/proj-x-gsheet/blob/prod/Project%20Structure.png)
+![alt text](https://github.com/WaassimDev/proj-x-gsheet/blob/prod/public/images/Project%20Structure.png)
 
 ## API Documentation
 
@@ -373,5 +373,8 @@ This will apply your changes and restart the application using the PM2 process m
 5. Submit a pull request
 
 ## License
-Copyright (c) 2024 Wassim SLIM - BI DEVELOPER - AZIZA Retail & WholeSale.  
-This project is licensed under the [MIT License](LICENSE).
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+
