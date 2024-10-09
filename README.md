@@ -373,5 +373,6 @@ This will apply your changes and restart the application using the PM2 process m
 5. Submit a pull request
 
 ## License
-
+## License
+Copyright (c) 2024 Wassim SLIM - BI DEVELOPER - AZIZA Retail & WholeSale.  
 This project is licensed under the [MIT License](LICENSE).
