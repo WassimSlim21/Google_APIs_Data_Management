@@ -1,5 +1,4 @@
-# Google_APIs_Data_Management
-
+# GCPMigrationXProject
 
 This project is a Node.js-based web application that automates the process of fetching, processing, and storing data from Google Sheets into a Microsoft SQL Server database. It enables users to efficiently upload files to Google Drive and perform various data management operations by seamlessly integrating with the Google Sheets API and Google Drive API. The application features custom middleware for authentication, data retrieval, and SQL data insertion.
 
@@ -63,11 +62,11 @@ The SSIS package is executed via a SQL Agent. Results and status codes are retur
 
 1. Clone the repository:
    ```
-   git clone https://github.com/WassimSlim21/Google_APIs_Data_Management.git
+   git clone https://github.com/your-username/GCPMigrationXProject.git
    ```
 2. Navigate to the project directory:
    ```
-   cd google_apis_data_management
+   cd GCPMigrationXProject
    ```
 3. Install dependencies:
    ```
@@ -92,7 +91,7 @@ The SSIS package is executed via a SQL Agent. Results and status codes are retur
 ## Project Structure
 
 ```
-Google_APIs_Data_Management/
+GCPMigrationXProject/
 │
 ├── bin/
 │   └── www                 # Server startup script
