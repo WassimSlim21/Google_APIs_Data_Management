@@ -100,7 +100,6 @@ GCPMigrationXProject/
 ├── controllers/
 │   ├── dataExported.js     # Controller for data export operations
 │   ├── dataImported.js     # Controller for data import operations
-│   └── jeuTirage.js        # Controller for game rules operations
 ├── middlewares/
 │   └── gsheetConnection.js # Middleware for Google Sheets authentication
 ├── models/
@@ -108,7 +107,6 @@ GCPMigrationXProject/
 ├── routes/
 │   ├── dataExported_Route.js # Routes for data export operations
 │   ├── dataImported_Route.js # Routes for data import operations
-│   └── jeuTirage.js          # Routes for game rules operations
 ├── services/
 │   └── googleService.js    # Google API related services
 ├── .env                    # Environment variables
