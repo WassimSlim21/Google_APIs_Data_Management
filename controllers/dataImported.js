@@ -38,36 +38,7 @@ async function getImportedDataWithCondition(req, res) {
   }
 }
 
-async function getArticles(req, res) {
-  const { Table_name, Columns, spreadsheetId, pageName } = req.body;
-
-  // Check if Table_name and Columns are provided
-  if (!Table_name || !Array.isArray(Columns) || Columns.length === 0) {
-    return res.status(400).json({ success: false, message: "Table_name and Columns are required." });
-  }
-
-  try {
-    const data = await dataModel.getDataFromSQLServer(Table_name, Columns);
-
-    const floatColumns = ['Article', 'PRV_PROMO', 'PV', 'TVA_ACHAT', 'COUT_TRANSP', 'PV_PERMANENT', 'PRV_PERM'];
-    const convertedData = data.map(row => {
-      floatColumns.forEach(col => {
-        if (row[col]) {
-          row[col] = parseFloat(row[col]);
-        }
-      });
-      return row;
-    });
-
-    await updateGoogleSheet(convertedData, spreadsheetId, pageName, req.authClient, Columns);
-    res.status(200).json({ success: true, message: "Data has been exported to Google Sheets successfully." });
-  } catch (err) {
-    res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
-  }
-}
-
 module.exports = {
   getImportedData,
-  getImportedDataWithCondition,
-  getArticles
+  getImportedDataWithCondition
 };

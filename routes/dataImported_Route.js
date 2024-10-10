@@ -93,36 +93,6 @@ router.post('/', connectToGsheet, dataImportedController.getImportedData);
  */
 router.post('/filtered', connectToGsheet, dataImportedController.getImportedDataWithCondition);
 
-// Post Articles Data to Gsheet Développement spécéfisue avec transformation des données 
-/**
- * @route POST /articles
- * @desc Post articles data to Google Sheets with specific transformation (float columns).
- * @access Public
- * @returns {Object} Response with success or failure message.
- * 
- * Specefique Dev for Anis Elhraiech
- * **Request Example:**
- *  POST http://<hostname>:<port>/articles
- *  Request Body:
- *  ```json
- *  {
- *    "Table_name": "articlesTable",
- *    "Columns": ["Article", "PRV_PROMO", "PV", "TVA_ACHAT", "COUT_TRANSP", "PV_PERMANENT", "PRV_PERM"],
- *    "spreadsheetId": "spreadsheet-id",
- *    "pageName": "Sheet1"
- *  }
- *  ```
- * 
- * **Response Example:**
- *  HTTP 200:
- *  ```json
- *  {
- *    "success": true,
- *    "message": "Articles data has been exported to Google Sheets successfully."
- *  }
- *  ```
- */
-router.post('/articles', connectToGsheet, dataImportedController.getArticles);
 
 // Post Upload File to Drive
 /**

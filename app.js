@@ -7,7 +7,6 @@ const logger = require('morgan');
 
 
 const dataImportedRouter = require('./routes/dataImported_Route');
-const jeuTirageRouter = require('./routes/jeuTirage');
 const dataExportedRouter = require('./routes/dataExported_Route');
 
 // Create an Express application.
@@ -28,7 +27,6 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files f
 
 app.use('/data_imported', dataImportedRouter); // Use the data imported router for '/data_imported' path.
 app.use('/exportData', dataExportedRouter); // Use the data imported router for '/data_imported' path.
-app.use('/jeuTirage', jeuTirageRouter); // Use the data imported router for '/data_imported' path.
 
 // Catch 404 and forward to error handler.
 app.use(function(req, res, next) {

@@ -147,33 +147,6 @@ GCPMigrationXProject/
 - `spreadsheetId`: The ID of the Google Sheet to update
 - `range`: The range in the sheet to update (e.g., "Sheet1!A1:D10")
 
-### `/data_imported/articles`
-
-**Method:** POST
-
-**Description:** Import article data to Google Sheets
-
-**Request Body:**
-```json
-{
-  "Table_name": "string",
-  "Columns": {
-    "Article": "float",
-    "PRV_PROMO": "float",
-    "PV": "float",
-    "TVA_ACHAT": "float",
-    "COUT_TRANSP": "float",
-    "PV_PERMANENT": "float",
-    "PRV_PERM": "float",
-    ...
-  },
-  "spreadsheetId": "string",
-  "range": "string"
-}
-```
-
-- Fields are similar to `/data_imported/`, but specific columns are converted to float
-
 ### `/exportData`
 
 **Method:** POST
@@ -227,7 +200,6 @@ GCPMigrationXProject/
 }
 ```
 
-
 ### `/data_imported/upload`
 
 **Method:** POST
@@ -266,43 +238,62 @@ GCPMigrationXProject/
 - `sharedDriveId`: The ID of the shared Google Drive
 - `folderId`: The ID of the folder in the shared drive to upload to
 
-### `/jeuTirage/get_rules`
+### `/filtered`
 
 **Method:** POST
 
-**Description:** Retrieve game rules
+**Description:** Post filtered data to Google Sheets based on the provided condition.
 
 **Request Body:**
 ```json
 {
+  "Table_name": "string",
+  "Columns": ["string"],
   "spreadsheetId": "string",
-  "range": "string"
+  "pageName": "string",
+  "condition": "string"
 }
 ```
 
-- `spreadsheetId`: The ID of the Google Sheet containing the rules
-- `range`: The range in the sheet to retrieve data from
+- `Table_name`: The name of the SQL table to fetch data from
+- `Columns`: An array of column names to fetch
+- `spreadsheetId`: The ID of the Google Sheet to update
+- `pageName`: The name of the worksheet (tab) in the sheet to update
+- `condition`: SQL condition to filter the data (e.g., "column1 = 'some_value'")
 
-### `/jeuTirage/getCodeAM`
-
-**Method:** POST
-
-**Description:** Retrieve CodeAM from Google Sheets
-
-**Request Body:**
+**Response (Success):**
 ```json
 {
-  "spreadsheetId": "string",
-  "PageName": "string"
+  "success": true,
+  "message": "Filtered data has been exported to Google Sheets successfully.",
+  "data": [ ... ]
 }
 ```
 
-- `spreadsheetId`: The ID of the Google Sheet containing the CodeAM
-- `PageName`: The name of the sheet to retrieve the CodeAM from (the CodeAM is expected to be in cell G1)
+- `data`: An array of objects representing the filtered data that was exported
 
+**Response (Error):**
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "error": "Detailed error message"
+}
+```
 
+**Example Usage:**
+```http
+POST http://<hostname>:<port>/filtered
+Content-Type: application/json
 
-
+{
+  "Table_name": "myTable",
+  "Columns": ["column1", "column2"],
+  "spreadsheetId": "spreadsheet-id",
+  "pageName": "Sheet1",
+  "condition": "column1 = 'some_value'"
+}
+```
 
 ## Dependencies
 
