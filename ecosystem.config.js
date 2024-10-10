@@ -1,7 +1,7 @@
 module.exports = {
     apps: [
       {
-        name: 'projxgsheetmigration',
+        name: 'google_apis_data_management',
         script: 'bin/www',
         instances: 'max', // or specify the number of instances
         exec_mode: 'cluster',
